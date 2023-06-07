@@ -1,42 +1,48 @@
-//your code here
-  const divs = document.querySelectorAll('.image');
+// your scripts here!
 
-    let draggedItem = null;
+let dragindex = 0;
+let dropindex = 0;
+let clone = "";
 
-    divs.forEach(div => {
-      div.addEventListener('dragstart', () => {
-        draggedItem = div;
-        div.classList.add('selected');
-      });
+const images = document.querySelectorAll(".image");
 
-      div.addEventListener('dragend', () => {
-        draggedItem = null;
-        div.classList.remove('selected');
-      });
+function drag(e) {
+  e.dataTransfer.setData("text", e.target.id);
+}
 
-      div.addEventListener('dragover', e => {
-        e.preventDefault();
-      });
+function allowDrop(e) {
+  e.preventDefault();
+}
 
-      div.addEventListener('dragenter', e => {
-        e.preventDefault();
-        div.classList.add('selected');
-      });
+function drop(e) {
+  clone = e.target.cloneNode(true);
+  let data = e.dataTransfer.getData("text");
+  let nodelist = document.getElementById("parent").childNodes;
+  console.log(data, e.target.id);
+  for (let i = 0; i < nodelist.length; i++) {
+    if (nodelist[i].id == data) {
+      dragindex = i;
+    }
+  }
 
-      div.addEventListener('dragleave', () => {
-        div.classList.remove('selected');
-      });
+  dragdrop(clone);
 
-      div.addEventListener('drop', () => {
-        if (draggedItem && draggedItem !== div) {
-          const tempHTML = div.innerHTML;
-          const tempClass = div.className;
-          div.innerHTML = draggedItem.innerHTML;
-          div.className = draggedItem.className;
-          draggedItem.innerHTML = tempHTML;
-          draggedItem.className = tempClass;
-        }
-        div.classList.remove('selected');
-      });
-    });
- 
+  document
+    .getElementById("parent")
+    .replaceChild(document.getElementById(data), e.target);
+
+  document
+    .getElementById("parent")
+    .insertBefore(
+      clone,
+      document.getElementById("parent").childNodes[dragindex]
+    );
+}
+
+const dragdrop = (image) => {
+  image.ondragstart = drag;
+  image.ondragover = allowDrop;
+  image.ondrop = drop;
+};
+
+images.forEach(dragdrop);
